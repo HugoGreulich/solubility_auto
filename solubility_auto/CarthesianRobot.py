@@ -1,8 +1,19 @@
 import serial
 import time
 import re
+import configparser
 
-printable_size=[220,220,250]
+config_path = r'C:\Users\Hugo Greulich Mayor\Documents\GitHub\solubility_auto\config\anycubic_kobra_neo_2.ini' # check pour plus simple
+
+config = configparser.ConfigParser()
+config.read(config_path)
+dim_x = config.getint('DEFAULT', 'dim_x')
+dim_y = config.getint('DEFAULT', 'dim_y')
+dim_z = config.getint('DEFAULT', 'dim_z')
+A1_x = config.getint('SETTINGS', 'A1_x')
+A1_y = config.getint('SETTINGS', 'A1_y')
+pos_low = config.getint('SETTINGS', 'pos_low')
+pos_high = config.getint('SETTINGS', 'pos_high')
 
 class CarthesianRobot:
     def __init__(self):
@@ -41,23 +52,53 @@ class CarthesianRobot:
             y_value = float(match.group(2))
             z_value = float(match.group(3))
             current_position = [x_value, y_value, z_value]
+            print(current_position)
             return current_position
         else:
             print("No X, Y, and Z values found in the response string.")
 
-    def move_relative(self, x=None, y=None, z=None):
-        current_positions = self.get_current_position()
-        increments = [float(x), float(y), float(z)]
-        new_positions = [position + increment for position, increment in zip(current_positions, increments)]
-        if 0<new_positions[0]<printable_size[0] and 0<new_positions[1]<printable_size[1] and 0<new_positions[2]<printable_size[2]:
-            self.send_gcode("G91")  # Set to relative positioning
-            self.move_axis(x, y, z)
-        else:
-            print("Movement out of bounds")
+#    def move_relative(self, x=None, y=None, z=None):
+#        current_positions = self.get_current_position()
+#        increments = [float(x), float(y), float(z)]
+#        new_positions = [position + increment for position, increment in zip(current_positions, increments)]
+#        if 0 < new_positions[0] < dim_x and 0 < new_positions[1] < dim_y and 0 < new_positions[2] < dim_z:
+#            self.send_gcode("G91")  # Set to relative positioning
+#            self.move_axis(x, y, z)
+#        else:
+#            print("Movement out of bounds")
+#
+    def move_relative(self, x=None, y=None, z=None):  # Le check 'is next move in range' me pose beaucoup de galères. Pour l'instant j'utilise ça.
+        self.send_gcode("G91")
+        self.move_axis(x, y, z)
 
     def move_absolute(self, x=None, y=None, z=None):
         self.send_gcode("G90")  # Set to absolute positioning
         self.move_axis(x, y, z)
+
+    def move_to_rest(self):
+        self.move_absolute(None, None, dim_z)
+        self.move_absolute(dim_x, dim_y, None)
+
+    def move_up(self):
+        self.move_absolute(None, None, pos_high)  # Set z-axis as desired to get pipette out of vial
+
+    def move_down(self):
+        self.move_absolute(None, None, pos_low)  # Here I defined the height at which pipette should be lowered to in the .ini file
+
+    def move_increase_nbr(self):
+        self.move_up()
+        self.move_relative(0, -9, 0)
+        self.move_down()
+
+    def move_decrease_nbr(self):
+        self.move_up()
+        self.move_relative(0, 9, 0)
+        self.move_down()
+
+    def move_increase_let(self):
+        self.move_up()
+        self .move_relative(-9, 0, 0)
+        self.move_down()
 
     def move_axis(self, x=None, y=None, z=None):
         command = "G1"
@@ -77,6 +118,7 @@ class CarthesianRobot:
 
     def home_all(self):
         self.send_gcode(f"G28 X Y Z")
+        self.wait()
     
     def set_acceleration(self, acceleration, travel_acceleration):
         self.send_gcode(f"M204 P{acceleration} T{travel_acceleration}")
@@ -84,5 +126,5 @@ class CarthesianRobot:
     def set_feedrate(self, feedrate):
         self.feedrate = feedrate
 
-    def wait(self, time):
-        self.send_gcode(f"G4 P{time}")
+    def wait(self):
+        self.send_gcode("M400")
