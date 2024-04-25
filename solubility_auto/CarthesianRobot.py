@@ -14,6 +14,8 @@ A1_x = config.getint('SETTINGS', 'A1_x')
 A1_y = config.getint('SETTINGS', 'A1_y')
 pos_low = config.getint('SETTINGS', 'pos_low')
 pos_high = config.getint('SETTINGS', 'pos_high')
+columns = config.getint('SETTINGS', 'columns')
+rows = config.getint('SETTINGS', 'rows')
 
 class CarthesianRobot:
     def __init__(self):
@@ -24,7 +26,7 @@ class CarthesianRobot:
         """
         Establishes a serial connection using specified settings.
         """
-        self.serial = serial.Serial(port, baudrate, timeout=1)
+        self.serial = serial.Serial(port, baudrate, timeout=None)
         time.sleep(2)  # Wait for connection to establish
         print(f"Connected to {port} at {baudrate} baud rate.")
 
@@ -57,33 +59,35 @@ class CarthesianRobot:
         else:
             print("No X, Y, and Z values found in the response string.")
 
-#    def move_relative(self, x=None, y=None, z=None):
-#        current_positions = self.get_current_position()
-#        increments = [float(x), float(y), float(z)]
-#        new_positions = [position + increment for position, increment in zip(current_positions, increments)]
-#        if 0 < new_positions[0] < dim_x and 0 < new_positions[1] < dim_y and 0 < new_positions[2] < dim_z:
-#            self.send_gcode("G91")  # Set to relative positioning
-#            self.move_axis(x, y, z)
-#        else:
-#            print("Movement out of bounds")
-#
+    def move_relative(self, x=None, y=None, z=None):
+        current_positions = self.get_current_position()
+        increments = [float(x), float(y), float(z)]
+        new_positions = [position + increment for position, increment in zip(current_positions, increments)]
+        if 0 < new_positions[0] < dim_x and 0 < new_positions[1] < dim_y and 0 < new_positions[2] < dim_z:
+            self.send_gcode("G91")  # Set to relative positioning
+            self.move_axis(x, y, z)
+        else:
+            print("Movement out of bounds")
+
     def move_relative(self, x=None, y=None, z=None):  # Le check 'is next move in range' me pose beaucoup de galères. Pour l'instant j'utilise ça.
         self.send_gcode("G91")
         self.move_axis(x, y, z)
+        self.send_gcode("M400")
 
     def move_absolute(self, x=None, y=None, z=None):
         self.send_gcode("G90")  # Set to absolute positioning
         self.move_axis(x, y, z)
-
-    def move_to_rest(self):
-        self.move_absolute(None, None, dim_z)
-        self.move_absolute(dim_x, dim_y, None)
+        self.send_gcode("M400")
 
     def move_up(self):
         self.move_absolute(None, None, pos_high)  # Set z-axis as desired to get pipette out of vial
 
     def move_down(self):
         self.move_absolute(None, None, pos_low)  # Here I defined the height at which pipette should be lowered to in the .ini file
+
+    def move_to_rest(self):
+        self.move_absolute(None, None, dim_z)
+        self.move_absolute(dim_x, dim_y, None)
 
     def move_increase_nbr(self):
         self.move_up()
@@ -97,7 +101,7 @@ class CarthesianRobot:
 
     def move_increase_let(self):
         self.move_up()
-        self .move_relative(-9, 0, 0)
+        self.move_relative(-9, 0, 0)
         self.move_down()
 
     def move_axis(self, x=None, y=None, z=None):
@@ -118,13 +122,9 @@ class CarthesianRobot:
 
     def home_all(self):
         self.send_gcode(f"G28 X Y Z")
-        self.wait()
     
     def set_acceleration(self, acceleration, travel_acceleration):
         self.send_gcode(f"M204 P{acceleration} T{travel_acceleration}")
 
     def set_feedrate(self, feedrate):
         self.feedrate = feedrate
-
-    def wait(self):
-        self.send_gcode("M400")

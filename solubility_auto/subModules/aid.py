@@ -1,4 +1,5 @@
 import configparser
+import time
 
 config_path = r'C:\Users\Hugo Greulich Mayor\Documents\GitHub\solubility_auto\config\anycubic_kobra_neo_2.ini' # check pour plus simple
 
@@ -15,7 +16,8 @@ pos_high = config.getint('SETTINGS', 'pos_high')
 class help:
     def get_coords():
         coordinates = {}
-        letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+        #letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
+        letters = ['A', 'B']
         x = A1_x
         for letter in letters:
             y = A1_y
@@ -24,3 +26,6 @@ class help:
                 y -= 9
             x -= 9
         return coordinates
+    
+    def wait(seconds):
+        time.sleep(seconds)
