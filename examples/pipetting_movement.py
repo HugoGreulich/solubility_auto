@@ -17,12 +17,13 @@ pos_low = config.get('SETTINGS', 'pos_low')
 pos_high = config.get('SETTINGS', 'pos_high')
 columns = config.getint('SETTINGS', 'columns')
 rows = config.getint('SETTINGS', 'rows')
+cam_zone1_x = config.getint('SETTINGS', 'cam_zone1_x')
+cam_zone1_y = config.getint('SETTINGS', 'cam_zone1_y')
 
 robot = CarthesianRobot()
 robot.connect_serial(port, baudrate)
 robot.set_acceleration(5000, 5000)
 #robot.home_all()
-
 
 #coords = help.get_coords()
 #for coord in coords:
@@ -31,17 +32,20 @@ robot.set_acceleration(5000, 5000)
 #    robot.move_down()
 #robot.move_to_rest()
 
-robot.move_absolute(A1_x, A1_y, pos_high)
-robot.move_down()
-for row_pair in range(rows/2):
-    column = 1
-    while column < columns:
-        robot.move_increase_nbr()
-        column += 1
-    robot.move_increase_let()
-    while column > 1:
-        robot.move_decrease_nbr()
-        column -= 1
-    robot.move_increase_let()
+#robot.move_absolute(A1_x, A1_y, pos_high)
+#robot.move_down()
+#for row_pair in range(rows/2):
+#    column = 1
+#    while column < columns:
+#        robot.move_increase_nbr()
+#        column += 1
+#    robot.move_increase_let()
+#    while column > 1:
+#        robot.move_decrease_nbr()
+#        column -= 1
+#    robot.move_increase_let()
+
+robot.move_up()
+robot.move_absolute(cam_zone1_x, cam_zone1_y, None)
 
 robot.disconnect_serial()

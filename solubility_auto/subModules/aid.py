@@ -16,8 +16,7 @@ pos_high = config.getint('SETTINGS', 'pos_high')
 class help:
     def get_coords():
         coordinates = {}
-        #letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
-        letters = ['A', 'B']
+        letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H']
         x = A1_x
         for letter in letters:
             y = A1_y
