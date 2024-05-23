@@ -23,7 +23,7 @@ cam_zone1_y = config.getint('SETTINGS', 'cam_zone1_y')
 robot = CarthesianRobot()
 robot.connect_serial(port, baudrate)
 robot.set_acceleration(5000, 5000)
-#robot.home_all()
+robot.home_all()
 
 #coords = help.get_coords()
 #for coord in coords:
@@ -31,6 +31,10 @@ robot.set_acceleration(5000, 5000)
 #    robot.move_absolute(coords[coord][0], coords[coord][1], None)
 #    robot.move_down()
 #robot.move_to_rest()
+
+#robot.move_up()
+#robot.move_absolute(A1_x, A1_y, pos_high)
+#robot.move_down()
 
 #robot.move_absolute(A1_x, A1_y, pos_high)
 #robot.move_down()
@@ -45,7 +49,7 @@ robot.set_acceleration(5000, 5000)
 #        column -= 1
 #    robot.move_increase_let()
 
-robot.move_up()
-robot.move_absolute(cam_zone1_x, cam_zone1_y, None)
+#robot.move_up()
+#robot.move_absolute(cam_zone1_x, cam_zone1_y, None)
 
 robot.disconnect_serial()

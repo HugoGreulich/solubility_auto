@@ -91,17 +91,17 @@ class CarthesianRobot:
 
     def move_increase_nbr(self):
         self.move_up()
-        self.move_relative(0, -9, 0)
+        self.move_relative(9, 0, 0)
         self.move_down()
 
     def move_decrease_nbr(self):
         self.move_up()
-        self.move_relative(0, 9, 0)
+        self.move_relative(-9, 0, 0)
         self.move_down()
 
     def move_increase_let(self):
         self.move_up()
-        self.move_relative(-9, 0, 0)
+        self.move_relative(0, -9, 0)
         self.move_down()
 
     def move_axis(self, x=None, y=None, z=None):
