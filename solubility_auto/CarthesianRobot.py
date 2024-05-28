@@ -128,3 +128,6 @@ class CarthesianRobot:
 
     def set_feedrate(self, feedrate):
         self.feedrate = feedrate
+
+    def wait(self, seconds):
+        time.sleep(seconds)
